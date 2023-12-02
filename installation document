@@ -165,3 +165,29 @@ sudo curl -LO "https://dl.k8s.io/$(curl -L -s https://dl.k8s.io/release/stable.t
 sudo echo "$(cat kubectl.sha256) kubectl" | sha256sum --check
 sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 sudo minikube start --driver=docker --force
+
+============================================================================================================================
+                             docker compose installation
+
+                              DOCKER COMPOSE
+
+sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+     sudo chmod +x /usr/local/bin/docker-compose
+     sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+     docker-compose --version
+
+
+
+Execstart=/usr/bin/dockerd -h tcp://0.0.0.0:4243 -h unix:///var/run/docker.sock
+
+
+===========================================================================================================================
+                        java path
+
+export JAVA_HOME="/usr/lib/jvm/java-1.11.0"
+export PATH="$PATH:$(JAVA_HOME)/bin/"
+
+
+
+
+
