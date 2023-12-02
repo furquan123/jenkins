@@ -1,0 +1,167 @@
+                                      ARANGODB INSTALLATION SOME COMMANDS
+
+ echo 'deb https://download.arangodb.com/arangodb34/DEBIAN/ /' | sudo tee /etc/apt/sources.list.d/arangodb.list
+
+
+ wget -q https://download.arangodb.com/arangodb34/DEBIAN/Release.key -O- | sudo apt-key add -
+
+apt update -y
+apt -y install apt-transport-https
+apt install arangodb3 -y
+systemctl start arangodb3
+systemctl status arangodb3
+arangosh
+
+TO CREATE DATABASE: db._createDatabase("dbone");
+TO INFO DATABASE: db._databases();
+
+
+vim /etc/arangodb3/arangod.conf: GO HERE AND GIVE THIS IN SECOND LINE YOUR SERVER PRIVATE IP ADDRESS
+
+EXAMPLE (tcp://172.31.4.66:8529) 
+
+systemctl restart arangodb3: restart the arangodb
+
+
+====================================================================================================================
+                                         MYSQL INSTALLATION
+
+wget https://repo.percona.com/apt/percona-release_latest.$(lsb_release -sc)_all.deb
+ sudo dpkg -i percona-release_latest.$(lsb_release -sc)_all.deb
+ percona-release setup ps80
+ sudo apt install percona-server-server -y
+ mysql -u root -p
+
+COMMANDS: TO CREATE A DATABASE AND TO DELETE AND FOR INFORAMTION: 
+CREATE DATABASE FURKHAN;
+SHOW DATABASES;
+DROP DATABASE FURKHAN
+
+
+========================================================================================================================
+KUBERNETES INSTALLTAION
+
+
+LAUNCH INSTANACE WITH T2 MEDIUM AND 30GB SSD
+==================================================================================================================
+INSTALL AWS CLI FROM GOOGLE GO TO GOOGLE AND TPYE AWS CLI INSTALLATION AND CLICK LINUX AND COPY 3 COMMANDS AND PASTE ON MOBAXTERM                                      
+ =================================================================================================================                       
+                                           KOPS AND KUBECTL INSTALLATION                 
+
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+
+
+===================================================================================================================
+wget https://github.com/kubernetes/kops/releases/download/v1.24.1/kops-linux-amd64
+
+====================================================================================================================
+chmod +x kops-linux-amd64 kubectl
+mv kops-linux-amd64 /usr/local/bin/kops
+mv kubectl /usr/local/bin/kubectl
+====================================================================================================================
+vim .bashrc
+export PATH=$PATH:/usr/local/bin/
+source .bashrc
+aws --version
+kubectl version
+kops version
+==================================================================================================================
+                                              TO GET THE ACCESS KEY AND SECREATE KEY
+aws configure
+==================================================================================================================
+                                             TO CREATE BUCKET
+aws s3api create-bucket --bucket furkhan.k8s.local --region us-east-1
+==================================================================================================================
+                                             TO ENABLE THE VERSION
+aws s3api put-bucket-versioning --bucket furkhan.k8s.local --region us-east-1 --versioning-configuration Status=Enabled
+==================================================================================================================
+                                              TO EXPORT CLUSTER DATA INTO BUCKET
+export KOPS_STATE_STORE=s3://furkhan.k8s.local
+==================================================================================================================
+                                              TO CREATE CLUSTER
+kops create cluster --name furkhan.k8s.local --zones us-east-1a --master-size t2.medium --node-size t2.micro
+==================================================================================================================
+                                              TO GET THE CLUSTER
+kops get cluster
+==================================================================================================================
+                                              TO EDIT (OR) CHANGE ANYTHING
+kops edit cluster --name furkhan.k8s.local
+
+==================================================================================================================
+                                              TO CREATE CLUSTER
+kops update cluster --name furkhan.k8s.local --yes --admin
+
+==================================================================================================================
+                                              TO CREATE CLUSTER
+kops validate cluster --wait 10m
+==================================================================================================================
+                                              TO SEE HOW MANY NODES WE HAVE
+kubectl  get nodes
+==================================================================================================================
+kubectl get nodes -o wide 
+==================================================================================================================
+                                              TO DELETE CLUSTER
+kops delete cluster --name furkhan.k8s.local --yes
+
+==================================================================================================================
+
+                                               TO CREATE REPLICASET
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  labels:
+    app: swiggy
+  name: swiggy-rs
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: swiggy
+  template:
+    metadata:
+      labels:
+        app: swiggy
+    spec:
+      containers:
+      - name: cont1
+        image: nginx
+=================================================================================================================
+                               DEPLOYMENT MEAN UPDATING (OR) ROLLBACKING
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: swiggy
+  name: swiggy-deploy
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: swiggy
+  template:
+    metadata:
+      labels:
+        app: swiggy
+    spec:
+      containers:
+      - name: cont1
+        image: nginx:1.16
+==================================================================================================================
+ MINIKUBE INSTALLTION
+
+#! /bin/bash
+sudo apt update -y
+sudo apt upgrade -y
+sudo apt install curl wget apt-transport-https -y
+sudo curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
+sudo curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+sudo mv minikube-linux-amd64 /usr/local/bin/minikube
+sudo chmod +x /usr/local/bin/minikube
+sudo minikube version
+sudo curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+sudo curl -LO "https://dl.k8s.io/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256"
+sudo echo "$(cat kubectl.sha256) kubectl" | sha256sum --check
+sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+sudo minikube start --driver=docker --force
